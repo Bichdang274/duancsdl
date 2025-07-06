@@ -320,17 +320,17 @@ app.get('/csdlbenhnhan', (req, res) => {
 }); 
 
 app.post('/thembenhnhan', (req, res) => { 
-  const { mabenhnhan, tenbenhnhan, chuyenkhoa, luong, diachi, gioitinh, sdt } = req.body; 
+  const { mabenhnhan, tenbenhnhan, luong, diachi, gioitinh, sdt } = req.body; 
   const sql1 = 'INSERT INTO benhnhan (mabenhnhan, tenbenhnhan, chuyenkhoa, luong, diachi, gioitinh) VALUES (?, ?, ?, ?, ?, ?)'; 
-  const values1 = [mabenhnhan, tenbenhnhan, chuyenkhoa, luong, diachi, gioitinh]; 
+  const values1 = [mabenhnhan, tenbenhnhan, luong, diachi, gioitinh]; 
   const sql2 = 'INSERT INTO benhnhan_sdt (mabenhnhan, sdt) VALUES (?, ?)'; 
-  const values2 = [mabenhnhan, sdt]; // Giả sử benhnhan_sdt cần cả mã bác sĩ và số điện thoại 
+  const values2 = [mabenhnhan, sdt]; 
 
   connection.query(sql1, values1, (err1) => { 
     if (err1) return res.send('Lỗi thêm bác sĩ: ' + err1.message);  
 
   connection.query(sql2, values2, (err2) => { 
-    if (err2) return res.send('Đã thêm bác sĩ, nhưng lỗi khi thêm số điện thoại: ' + err2.message); 
+    if (err2) return res.send('Đã thêm bệnh nhân, nhưng lỗi khi thêm số điện thoại: ' + err2.message); 
     res.redirect('/'); 
     }); 
   }); 
@@ -360,7 +360,6 @@ app.get('/timkiembenhnhan', (req, res) => {
       benhnhanInfo = { 
         mabenhnhan: resultTim[0].mabenhnhan, 
         tenbenhnhan: resultTim[0].tenbenhnhan, 
-        chuyenkhoa: resultTim[0].chuyenkhoa, 
         luong: resultTim[0].luong, 
         diachi: resultTim[0].diachi, 
         gioitinh: resultTim[0].gioitinh, 
