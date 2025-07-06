@@ -138,10 +138,6 @@ app.post('/suaphieukham/:maphieukham', (req, res) => {
     }
   );
 });
-app.get('/csdlthuoc', (req, res) => {
-  res.render('csdlthuoc', { thuoc: null, timkiem: null });
-});
-
 
 
 
@@ -300,142 +296,145 @@ app.post('/suabacsi/:mabacsi', (req, res) => {
 
 
 //Bệnh nhân
-app.get('/csdlbenhnhan', (req, res) => { 
-  const query = ` 
-    SELECT benhnhan.*, benhnhan_sdt.sdt  
-    FROM benhnhan  
-    LEFT JOIN benhnhan_sdt ON benhnhan.mabenhnhan = benhnhan_sdt.mabenhnhan 
-  `; 
+// Hiển thị danh sách bệnh nhân
+app.get('/csdlbenhnhan', (req, res) => {
+  const query = `
+    SELECT benhnhan.*, benhnhan_sdt.sdt
+    FROM benhnhan
+    LEFT JOIN benhnhan_sdt ON benhnhan.mabenhnhan = benhnhan_sdt.mabenhnhan
+  `;
 
-  connection.query(query, (error, results) => { 
-    if (error) { 
-      return res.status(500).send('Lỗi truy vấn cơ sở dữ liệu'); 
-    } 
-    res.render('csdlbenhnhan', { 
-      benhnhan: null, 
-      timkiem: null, 
-      danhSachBenhnhan: results 
-    }); 
-  }); 
-}); 
-
-app.post('/thembenhnhan', (req, res) => { 
-  const { mabenhnhan, tenbenhnhan, luong, diachi, gioitinh, sdt } = req.body; 
-  const sql1 = 'INSERT INTO benhnhan (mabenhnhan, tenbenhnhan, luong, diachi, gioitinh) VALUES (?, ?, ?, ?, ?, ?)'; 
-  const values1 = [mabenhnhan, tenbenhnhan, luong, diachi, gioitinh]; 
-  const sql2 = 'INSERT INTO benhnhan_sdt (mabenhnhan, sdt) VALUES (?, ?)'; 
-  const values2 = [mabenhnhan, sdt]; 
-
-  connection.query(sql1, values1, (err1) => { 
-    if (err1) return res.send('Lỗi thêm bác sĩ: ' + err1.message);  
-
-  connection.query(sql2, values2, (err2) => { 
-    if (err2) return res.send('Đã thêm bệnh nhân, nhưng lỗi khi thêm số điện thoại: ' + err2.message); 
-    res.redirect('/'); 
-    }); 
-  }); 
-}); 
-
-app.get('/timkiembenhnhan', (req, res) => { 
-  const mabenhnhan = req.query.mabenhnhan; 
-  const sqlTim = ` 
-    SELECT benhnhan.*, benhnhan_sdt.sdt  
-    FROM benhnhan  
-    LEFT JOIN benhnhan_sdt ON benhnhan.mabenhnhan = benhnhan_sdt.mabenhnhan  
-    WHERE benhnhan.mabenhnhan = ? 
-  `; 
-  const sqlAll = ` 
-    SELECT benhnhan.*, benhnhan_sdt.sdt  
-    FROM benhnhan  
-    LEFT JOIN benhnhan_sdt ON benhnhan.mabenhnhan = benhnhan_sdt.mabenhnhan 
-  `; 
-
-  connection.query(sqlTim, [mabenhnhan], (errTim, resultTim) => { 
-    if (errTim) return res.send('Lỗi tìm kiếm: ' + errTim.message); 
- 
-  connection.query(sqlAll, (errAll, resultAll) => { 
-    if (errAll) return res.send('Lỗi lấy danh sách bác sĩ: ' + errAll.message); 
-    let benhnhanInfo = null; 
-    if (resultTim.length > 0) { 
-      benhnhanInfo = { 
-        mabenhnhan: resultTim[0].mabenhnhan, 
-        tenbenhnhan: resultTim[0].tenbenhnhan, 
-        luong: resultTim[0].luong, 
-        diachi: resultTim[0].diachi, 
-        gioitinh: resultTim[0].gioitinh, 
-        sdt: resultTim.map(r => r.sdt).filter(Boolean) 
-      }; 
-    } 
-    res.render('csdlbenhnhan', { 
-      benhnhan: benhnhanInfo, 
-      timkiem: mabenhnhan, 
-      danhSachBenhnhan: resultAll 
-      }); 
-    }); 
-  }); 
-}); 
-
-app.get('/benhnhan', (req, res) => { 
-  const query = ` 
-    SELECT benhnhan.mabenhnhan, benhnhan.tenbenhnhan, GROUP_CONCAT(benhnhan_sdt.sdt) AS sdt 
-    FROM benhnhan  
-    LEFT JOIN benhnhan_sdt ON benhnhan.mabenhnhan = benhnhan_sdt.mabenhnhan 
-    GROUP BY benhnhan.mabenhnhan 
-  `; 
-
-  connection.query(query, (error, results) => { 
-    if (error) { 
-      return res.status(500).send('Lỗi truy vấn cơ sở dữ liệu'); 
-    } 
+  connection.query(query, (error, results) => {
+    if (error) return res.status(500).send('Lỗi truy vấn cơ sở dữ liệu');
     res.render('csdlbenhnhan', {
       benhnhan: null,
-      timkiem: null, 
-      danhSachBenhnhan: results 
-    }); 
-  }); 
-}); 
+      timkiem: null,
+      danhSachBenhnhan: results
+    });
+  });
+});
 
-app.post('/xoabenhnhan', (req, res) => { 
-  const { mabenhnhan } = req.body; 
-  const deleteSDT = 'DELETE FROM benhnhan_sdt WHERE mabenhnhan = ?'; 
-  const deleteBenhnhan = 'DELETE FROM benhnhan WHERE mabenhnhan = ?'; 
-  connection.query(deleteSDT, [mabenhnhan], (err1) => { 
-    if (err1) return res.send('Lỗi xoá số điện thoại: ' + err1.message); 
+// Thêm bệnh nhân
+app.post('/thembenhnhan', (req, res) => {
+  const { mabenhnhan, tenbenhnhan, socccd, sothebaohiemyte, ngaysinh, gioitinh, diachi, sdt } = req.body;
 
-  connection.query(deleteBenhnhan, [mabenhnhan], (err2) => { 
-    if (err2) return res.send('Lỗi xoá bác sĩ: ' + err2.message); 
-      res.redirect('/csdlbenhnhan');  
-    }); 
-  }); 
-}); 
+  const sql1 = `
+    INSERT INTO benhnhan (mabenhnhan, socccd, sothebaohiemyte, tenbenhnhan, ngaysinh, gioitinh, diachi)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `;
+  const values1 = [mabenhnhan, socccd, sothebaohiemyte, tenbenhnhan, ngaysinh, gioitinh, diachi];
 
-app.post('/suabenhnhan/:mabenhnhan', (req, res) => { 
-  const mabenhnhan = req.params.mabenhnhan; 
-  const { tenbenhnhan, luong, diachi, gioitinh, sdt } = req.body; 
-  const sqlUpdate = ` 
-    UPDATE benhnhan  
-    SET tenbenhnhan = ?, luong = ?, diachi = ?, gioitinh = ? 
-    WHERE mabenhnhan = ? 
-  `; 
-  const sqlDeleteSDT = `DELETE FROM benhnhan_sdt WHERE mabenhnhan = ?`; 
-  const sqlInsertSDT = `INSERT INTO benhnhan_sdt (mabenhnhan, sdt) VALUES ?`; 
+  connection.query(sql1, values1, (err1) => {
+    if (err1) return res.send('Lỗi thêm bệnh nhân: ' + err1.message);
 
-  connection.query(sqlUpdate, [tenbenhnhan, chuyenkhoa, luong, diachi, gioitinh, mabenhnhan], (err1) => { 
-    if (err1) return res.send('Lỗi cập nhật bác sĩ: ' + err1.message); 
+    const sdtArr = sdt.split(',').map(s => s.trim()).filter(Boolean);
+    if (sdtArr.length === 0) return res.redirect('/csdlbenhnhan');
 
-  connection.query(sqlDeleteSDT, [mabenhnhan], (err2) => { 
-    if (err2) return res.send('Lỗi xoá sdt cũ: ' + err2.message); 
-      const sdtArr = sdt.split(',').map(s => s.trim()).filter(Boolean); 
-      const values = sdtArr.map(so => [mabenhnhan, so]); 
-      if (values.length === 0) return res.redirect('/csdlbenhnhan'); 
+    const sql2 = 'INSERT INTO benhnhan_sdt (mabenhnhan, sdt) VALUES ?';
+    const values2 = sdtArr.map(so => [mabenhnhan, so]);
 
-      connection.query(sqlInsertSDT, [values], (err3) => { 
-        if (err3) return res.send('Lỗi thêm sdt mới: ' + err3.message); 
-        res.redirect('/csdlbenhnhan'); 
-      }); 
-    }); 
-  }); 
-}); 
+    connection.query(sql2, [values2], (err2) => {
+      if (err2) return res.send('Lỗi thêm số điện thoại: ' + err2.message);
+      res.redirect('/csdlbenhnhan');
+    });
+  });
+});
+
+// Tìm kiếm bệnh nhân
+app.get('/timkiembenhnhan', (req, res) => {
+  const mabenhnhan = req.query.mabenhnhan;
+
+  const sqlTim = `
+    SELECT benhnhan.*, benhnhan_sdt.sdt
+    FROM benhnhan
+    LEFT JOIN benhnhan_sdt ON benhnhan.mabenhnhan = benhnhan_sdt.mabenhnhan
+    WHERE benhnhan.mabenhnhan = ?
+  `;
+  const sqlAll = `
+    SELECT benhnhan.*, benhnhan_sdt.sdt
+    FROM benhnhan
+    LEFT JOIN benhnhan_sdt ON benhnhan.mabenhnhan = benhnhan_sdt.mabenhnhan
+  `;
+
+  connection.query(sqlTim, [mabenhnhan], (errTim, resultTim) => {
+    if (errTim) return res.send('Lỗi tìm kiếm: ' + errTim.message);
+
+    connection.query(sqlAll, (errAll, resultAll) => {
+      if (errAll) return res.send('Lỗi truy vấn danh sách: ' + errAll.message);
+
+      let benhnhanInfo = null;
+      if (resultTim.length > 0) {
+        benhnhanInfo = {
+          mabenhnhan: resultTim[0].mabenhnhan,
+          socccd: resultTim[0].socccd,
+          sothebaohiemyte: resultTim[0].sothebaohiemyte,
+          tenbenhnhan: resultTim[0].tenbenhnhan,
+          ngaysinh: resultTim[0].ngaysinh,
+          gioitinh: resultTim[0].gioitinh,
+          diachi: resultTim[0].diachi,
+          sdt: resultTim.map(r => r.sdt).filter(Boolean)
+        };
+      }
+
+      res.render('csdlbenhnhan', {
+        benhnhan: benhnhanInfo,
+        timkiem: mabenhnhan,
+        danhSachBenhnhan: resultAll
+      });
+    });
+  });
+});
+
+// Xoá bệnh nhân
+app.post('/xoabenhnhan', (req, res) => {
+  const { mabenhnhan } = req.body;
+
+  const sql1 = 'DELETE FROM benhnhan_sdt WHERE mabenhnhan = ?';
+  const sql2 = 'DELETE FROM benhnhan WHERE mabenhnhan = ?';
+
+  connection.query(sql1, [mabenhnhan], (err1) => {
+    if (err1) return res.send('Lỗi xoá số điện thoại: ' + err1.message);
+
+    connection.query(sql2, [mabenhnhan], (err2) => {
+      if (err2) return res.send('Lỗi xoá bệnh nhân: ' + err2.message);
+      res.redirect('/csdlbenhnhan');
+    });
+  });
+});
+
+// Cập nhật bệnh nhân
+app.post('/suabenhnhan/:mabenhnhan', (req, res) => {
+  const mabenhnhan = req.params.mabenhnhan;
+  const { tenbenhnhan, socccd, sothebaohiemyte, ngaysinh, gioitinh, diachi, sdt } = req.body;
+
+  const sqlUpdate = `
+    UPDATE benhnhan
+    SET socccd = ?, sothebaohiemyte = ?, tenbenhnhan = ?, ngaysinh = ?, gioitinh = ?, diachi = ?
+    WHERE mabenhnhan = ?
+  `;
+
+  connection.query(sqlUpdate, [socccd, sothebaohiemyte, tenbenhnhan, ngaysinh, gioitinh, diachi, mabenhnhan], (err1) => {
+    if (err1) return res.send('Lỗi cập nhật bệnh nhân: ' + err1.message);
+
+    const sqlDeleteSDT = 'DELETE FROM benhnhan_sdt WHERE mabenhnhan = ?';
+    connection.query(sqlDeleteSDT, [mabenhnhan], (err2) => {
+      if (err2) return res.send('Lỗi xoá sdt cũ: ' + err2.message);
+
+      const sdtArr = sdt.split(',').map(s => s.trim()).filter(Boolean);
+      if (sdtArr.length === 0) return res.redirect('/csdlbenhnhan');
+
+      const sqlInsertSDT = 'INSERT INTO benhnhan_sdt (mabenhnhan, sdt) VALUES ?';
+      const values = sdtArr.map(so => [mabenhnhan, so]);
+
+      connection.query(sqlInsertSDT, [values], (err3) => {
+        if (err3) return res.send('Lỗi thêm sdt mới: ' + err3.message);
+        res.redirect('/csdlbenhnhan');
+      });
+    });
+  });
+});
+
+
 
  
 
@@ -624,6 +623,27 @@ app.get('/csdlchitiethoadon', (req, res) => {
   });
 });
 
+app.get('/timkiemchitiethoadon', (req, res) => {
+  const { mahoadon } = req.query;
+
+  const sqlTim = 'SELECT * FROM chitiethoadon WHERE mahoadon = ?';
+  const sqlAll = 'SELECT * FROM chitiethoadon';
+
+  connection.query(sqlTim, [mahoadon], (err1, result1) => {
+    if (err1) return res.send('Lỗi tìm kiếm: ' + err1.message);
+    connection.query(sqlAll, (err2, result2) => {
+      if (err2) return res.send('Lỗi truy vấn tất cả: ' + err2.message);
+      res.render('csdlchitiethoadon', {
+        chitiethoadon: result1,
+        timkiem: mahoadon,
+        danhSachChiTiet: result2
+      });
+    });
+  });
+});
+
+
+
 
 app.post('/themchitiethoadon', (req, res) => {
   const { mahoadon, mathuoc, soluong, donvitinh, dongia } = req.body;
@@ -664,6 +684,7 @@ app.post('/suachitiethoadon/:mahoadon/:mathuoc', (req, res) => {
 
 
 //hóa đơn
+
 app.get('/csdlhoadon', (req, res) => {
   const sql = 'SELECT * FROM hoadon';
   connection.query(sql, (err, results) => {
@@ -746,9 +767,9 @@ app.post('/themhoso', (req, res) => {
   const { mahoso, mabenhnhan, tiensubenh, thuocdangsd, diung, tiemchung, lienhekhancap} = req.body;
   const sql = `
     INSERT INTO hososuckhoe (mahoso, mabenhnhan, tiensubenh, thuocdangsd, diung, tiemchung, lienhekhancap)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
   `;
-  connection.query(sql, [mahoso, mabenhnhan, tiensubenh, thuocdangsd, diung, tiemchung, lienhekhancap, maphieukham], (err) => {
+  connection.query(sql, [mahoso, mabenhnhan, tiensubenh, thuocdangsd, diung, tiemchung, lienhekhancap], (err) => {
     if (err) return res.send('Lỗi thêm hồ sơ: ' + err.message);
     res.redirect('/csdlhososuckhoe');
   });

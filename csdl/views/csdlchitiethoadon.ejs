@@ -35,21 +35,24 @@
     <button type="submit">Tìm</button>
   </form>
 
-  <% if (chitiethoadon) { %>
-    <div id="cthd-info">
-      <h3>Thông tin chi tiết:</h3>
-      <ul>
-        <li>Mã hóa đơn: <%= chitiethoadon.mahoadon %></li>
-        <li>Mã thuốc: <%= chitiethoadon.mathuoc %></li>
-        <li>Số lượng: <%= chitiethoadon.soluong %></li>
-        <li>Đơn vị tính: <%= chitiethoadon.donvitinh %></li>
-        <li>Đơn giá: <%= chitiethoadon.dongia %></li>
-      </ul>
-      <button onclick="anThongTin(event)">Xóa khỏi giao diện</button>
-    </div>
+  <div id="cthd-info">
+  <% if (chitiethoadon && chitiethoadon.length > 0) { %>
+    <h3>Thông tin mã hóa đơn:</h3>
+        <ul>
+          <% chitiethoadon.forEach(ct => { %>
+            <li>Mã hóa đơn: <%= ct.mahoadon%></li>
+            <li>Mã thuốc: <%= ct.mathuoc %></li>
+            <li>Số lượng: <%= ct.soluong %></li>
+            <li>Đơn vị tính: <%= ct.donvitinh %></li>
+            <li>Đơn giá: <%= ct.dongia %></li>
+          </ul>  
+          <button onclick="anThongTin(event)">Xóa khỏi giao diện</button>
+        <% }) %>
   <% } else if (timkiem) { %>
     <p>Không tìm thấy chi tiết hóa đơn với mã "<%= timkiem %>"</p>
   <% } %>
+  </div>
+
 
   <script>
     function anThongTin() {

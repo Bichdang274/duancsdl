@@ -50,14 +50,14 @@
         <li>Giới tính: <%= benhnhan.gioitinh %></li>
         <li>Địa chỉ: <%= benhnhan.diachi %></li>
         <li>Số điện thoại:
-          <% if (benhnhan.sdt) {
-               const sdtArr = benhnhan.sdt.split(','); %>
-            <% sdtArr.forEach(so => { %>
-              <li><%= so.trim() %></li>
-            <% }) %>
-          <% } else { %>
-            <li>Không có</li>
-          <% } %>
+      <% if (Array.isArray(benhnhan.sdt)) { %>
+        <% benhnhan.sdt.forEach(so => { %>
+          <li><%= so %></li>
+        <% }) %>
+      <% } else if (benhnhan.sdt) { %>
+        <li><%= benhnhan.sdt %></li>
+      <% } %>
+
         </li>
       </ul>
       <button onclick="anThongTin(event)">Xóa khỏi giao diện</button>
@@ -111,22 +111,26 @@
             </form>
           </td>
           <td>
-            <button type="button" onclick="hienForm('<%= benhnhan.mabenhnhan %>')">Sửa</button>
+            <button type="button" onclick="hienForm('<%= benhnhan.mabenhnhan %>')">Sửa</button> 
           </td>
-          <td>
-            <form id="form-<%= benhnhan.mabenhnhan %>" action="/suabenhnhan/<%= benhnhan.mabenhnhan %>" method="POST" style="display: none;">
-              <input type="text" name="tenbenhnhan" value="<%= benhnhan.tenbenhnhan %>" required>
-              <input type="text" name="socccd" value="<%= benhnhan.socccd %>" required>
-              <input type="text" name="sothebaohiemyte" value="<%= benhnhan.sothebaohiemyte %>" required>
-              <input type="text" name="ngaysinh" value="<%= benhnhan.ngaysinh %>" required>
-              <input type="text" name="gioitinh" value="<%= benhnhan.gioitinh %>" required>
-              <input type="text" name="diachi" value="<%= benhnhan.diachi %>" required>
-              <input type="text" name="sdt" value="<%= benhnhan.sdt %>" required>
-              <button type="submit">Lưu</button>
-              <button type="button" onclick="anForm('<%= benhnhan.mabenhnhan %>')">Hủy</button>
-            </form>
-          </td>
-        </tr>
+          </tr> 
+          <tr id="form-<%= benhnhan.mabenhnhan %>" style="display: none; background: #eef;">
+            <td colspan="11">
+              <form action="/suabenhnhan/<%= benhnhan.mabenhnhan %>" method="POST">
+                <input type="text" name="tenbenhnhan" value="<%= benhnhan.tenbenhnhan %>" required>
+                <input type="text" name="socccd" value="<%= benhnhan.socccd %>" required>
+                <input type="text" name="sothebaohiemyte" value="<%= benhnhan.sothebaohiemyte %>" required>
+                <input type="date" name="ngaysinh" value="<%= benhnhan.ngaysinh.toISOString().substring(0, 10) %>">
+                <input type="text" name="gioitinh" value="<%= benhnhan.gioitinh %>" required>
+                <input type="text" name="diachi" value="<%= benhnhan.diachi %>" required>
+                <input type="text" name="sdt" value="<%= benhnhan.sdt %>" required>
+                <button type="submit">Lưu</button>
+                <button type="button" onclick="anForm('<%= benhnhan.mabenhnhan %>')">Hủy</button>
+              </form>
+            </td>
+          </tr>
+
+
       <% }) %>
     </tbody>
   </table>
