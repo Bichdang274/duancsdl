@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quản lý Đơn thuốc</title>
+  <link rel="stylesheet" href="/csdl2.css">
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <h2 class="add">Thêm đơn thuốc</h2>
+  <form method="POST" action="/themdonthuoc">
+    <input type="text" name="madonthuoc" placeholder="Mã đơn thuốc" required />
+    <input type="text" name="cachdung"     placeholder="Cách dùng"     required />
+    <input type="text" name="lieuluong"    placeholder="Liều lượng"     required />
+    <input type="text" name="maphieukham"   placeholder="Mã phiếu khám" required />
+    <button type="submit">Thêm</button>
+  </form>
+
+  <h2>Tìm kiếm đơn thuốc</h2>
+  <form action="/timkiemdonthuoc" method="GET">
+    <label for="madonthuoc">Nhập mã đơn thuốc:</label>
+    <input type="text" name="madonthuoc" required>
+    <button type="submit">Tìm</button>
+  </form>
+
+  <% if (donthuoc) { %>
+    <div id="dt-info">
+      <h3>Thông tin đơn thuốc:</h3>
+      <ul>
+        <li>Mã đơn thuốc: <%= donthuoc.madonthuoc %></li>
+        <li>Cách dùng:      <%= donthuoc.cachdung %></li>
+        <li>Liều lượng:      <%= donthuoc.lieuluong %></li>
+        <li>Mã phiếu khám:  <%= donthuoc.maphieukham %></li>
+      </ul>
+      <button onclick="anThongTin(event)">Xóa khỏi giao diện</button>
+    </div>
+  <% } else if (timkiem) { %>
+    <p>Không tìm thấy đơn thuốc với mã "<%= timkiem %>"</p>
+  <% } %>
+
+  <h1>Danh sách Đơn thuốc</h1>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Mã đơn thuốc</th>
+        <th>Cách dùng</th>
+        <th>Liều lượng</th>
+        <th>Mã phiếu khám</th>
+        <th>Xóa</th>
+        <th>Sửa</th>
+        <th>Form sửa</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% danhSachDonThuoc.forEach(dt => { %>
+        <tr>
+          <td><%= dt.madonthuoc %></td>
+          <td><%= dt.cachdung %></td>
+          <td><%= dt.lieuluong %></td>
+          <td><%= dt.maphieukham %></td>
+          <td>
+            <form action="/xoadonthuoc" method="POST" onsubmit="return confirm('Bạn có chắc muốn xoá đơn thuốc này?');">
+              <input type="hidden" name="madonthuoc" value="<%= dt.madonthuoc %>">
+              <button type="submit">Xóa</button>
+            </form>
+          </td>
+          <td>
+            <button type="button" onclick="hienForm('<%= dt.madonthuoc %>')">Sửa</button>
+          </td>
+          <td>
+            <form
+              id="form-<%= dt.madonthuoc %>"
+              action="/suadonthuoc/<%= dt.madonthuoc %>"
+              method="POST"
+              style="display: none;"
+            >
+              <input type="text" name="cachdung"   value="<%= dt.cachdung %>"   required>
+              <input type="text" name="lieuluong"  value="<%= dt.lieuluong %>"   required>
+              <input type="text" name="maphieukham" value="<%= dt.maphieukham %>" required>
+              <button type="submit">Lưu</button>
+              <button type="button" onclick="anForm('<%= dt.madonthuoc %>')">Hủy</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <%- include('partials/footer') %>
+
+  <script>
+    function hienForm(id) {
+      document.getElementById('form-' + id).style.display = 'block';
+    }
+    function anForm(id) {
+      document.getElementById('form-' + id).style.display = 'none';
+    }
+    function anThongTin(event) {
+      const info = document.getElementById('dt-info');
+      if (info) info.remove();
+      event.target.style.display = 'none';
+    }
+  </script>
+</body>
+</html>

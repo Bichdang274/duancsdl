@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chi tiết Hóa đơn</title>
+  <link rel="stylesheet" href="/csdl2.css">
+</head>
+
+<script>
+  function hienForm(id) {
+    document.getElementById('form-' + id).style.display = 'block';
+  }
+  function anForm(id) {
+    document.getElementById('form-' + id).style.display = 'none';
+  }
+</script>
+
+<body>
+  <%- include('partials/header') %>
+
+  <h2 class="add">Thêm chi tiết hóa đơn</h2>
+  <form method="POST" action="/themchitiethoadon">
+    <input type="text" name="mahoadon" placeholder="Mã hóa đơn" required />
+    <input type="text" name="mathuoc" placeholder="Mã thuốc" required />
+    <input type="number" name="soluong" placeholder="Số lượng" required />
+    <input type="text" name="donvitinh" placeholder="Đơn vị tính" required />
+    <input type="number" name="dongia" placeholder="Đơn giá" required />
+    <button type="submit">Thêm</button>
+  </form>
+
+  <h2>Tìm kiếm chi tiết hóa đơn</h2>
+  <form action="/timkiemchitiethoadon" method="GET">
+    <label for="mahoadon">Nhập mã hóa đơn:</label>
+    <input type="text" name="mahoadon" required>
+    <button type="submit">Tìm</button>
+  </form>
+
+  <% if (chitiethoadon) { %>
+    <div id="cthd-info">
+      <h3>Thông tin chi tiết:</h3>
+      <ul>
+        <li>Mã hóa đơn: <%= chitiethoadon.mahoadon %></li>
+        <li>Mã thuốc: <%= chitiethoadon.mathuoc %></li>
+        <li>Số lượng: <%= chitiethoadon.soluong %></li>
+        <li>Đơn vị tính: <%= chitiethoadon.donvitinh %></li>
+        <li>Đơn giá: <%= chitiethoadon.dongia %></li>
+      </ul>
+      <button onclick="anThongTin(event)">Xóa khỏi giao diện</button>
+    </div>
+  <% } else if (timkiem) { %>
+    <p>Không tìm thấy chi tiết hóa đơn với mã "<%= timkiem %>"</p>
+  <% } %>
+
+  <script>
+    function anThongTin() {
+      const thongTin = document.getElementById('cthd-info');
+      if (thongTin) {
+        thongTin.remove();
+      }
+      event.target.style.display = "none";
+    }
+  </script>
+
+  <h1>Danh sách Chi tiết Hóa đơn</h1>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Mã HĐ</th>
+        <th>Mã thuốc</th>
+        <th>Số lượng</th>
+        <th>Đơn vị tính</th>
+        <th>Đơn giá</th>
+        <th>Xoá</th>
+        <th>Sửa</th>
+        <th>Form sửa</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% danhSachChiTiet.forEach(ct => { %>
+        <tr>
+          <td><%= ct.mahoadon %></td>
+          <td><%= ct.mathuoc %></td>
+          <td><%= ct.soluong %></td>
+          <td><%= ct.donvitinh %></td>
+          <td><%= ct.dongia %></td>
+          <td>
+            <form action="/xoachitiethoadon" method="POST" onsubmit="return confirm('Bạn có chắc muốn xoá mục này?');">
+              <input type="hidden" name="mahoadon" value="<%= ct.mahoadon %>" />
+              <input type="hidden" name="mathuoc" value="<%= ct.mathuoc %>" />
+              <button type="submit">Xoá</button>
+            </form>
+          </td>
+          <td>
+            <button type="button" onclick="hienForm('<%= ct.mahoadon + '-' + ct.mathuoc %>')">Sửa</button>
+          </td>
+          <td>
+            <form id="form-<%= ct.mahoadon + '-' + ct.mathuoc %>" action="/suachitiethoadon/<%= ct.mahoadon %>/<%= ct.mathuoc %>" method="POST" style="display: none;">
+              <input type="number" name="soluong" value="<%= ct.soluong %>" required>
+              <input type="text" name="donvitinh" value="<%= ct.donvitinh %>" required>
+              <input type="number" name="dongia" value="<%= ct.dongia %>" required>
+              <button type="submit">Lưu</button>
+              <button type="button" onclick="anForm('<%= ct.mahoadon + '-' + ct.mathuoc %>')">Hủy</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <%- include('partials/footer') %>
+</body>
+</html>

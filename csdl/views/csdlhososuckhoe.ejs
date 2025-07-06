@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hồ sơ sức khỏe</title>
+  <link rel="stylesheet" href="/csdl2.css">
+</head>
+
+<script>
+  function hienForm(id) {
+    document.getElementById('form-' + id).style.display = 'block';
+  }
+  function anForm(id) {
+    document.getElementById('form-' + id).style.display = 'none';
+  }
+</script>
+
+<body>
+  <%- include('partials/header') %>
+
+  <h2 class="add">Thêm hồ sơ sức khỏe</h2>
+  <form method="POST" action="/themhoso">
+    <input type="text" name="mahoso" placeholder="Mã hồ sơ" required />
+    <input type="text" name="mabenhnhan" placeholder="Mã bệnh nhân" required />
+    <input type="text" name="tiensubenh" placeholder="Tiền sử bệnh" />
+    <input type="text" name="thuocdangsd" placeholder="Thuốc đang sử dụng" />
+    <input type="text" name="diung" placeholder="Dị ứng" />
+    <input type="text" name="tiemchung" placeholder="Tiêm chủng" />
+    <input type="text" name="lienhekhancap" placeholder="Liên hệ khẩn cấp" />
+    <button type="submit">Thêm</button>
+  </form>
+
+  <h2>Tìm kiếm hồ sơ</h2>
+  <form action="/timkiemhoso" method="GET">
+    <input type="text" name="mahoso" placeholder="Nhập mã hồ sơ" required />
+    <button type="submit">Tìm</button>
+  </form>
+
+  <% if (hoso) { %>
+    <div id="hoso-info">
+      <h3>Thông tin hồ sơ:</h3>
+      <ul>
+        <li>Mã hồ sơ: <%= hoso.mahoso %></li>
+        <li>Mã bệnh nhân: <%= hoso.mabenhnhan %></li>
+        <li>Tiền sử bệnh: <%= hoso.tiensubenh %></li>
+        <li>Thuốc đang dùng: <%= hoso.thuocdangsd %></li>
+        <li>Dị ứng: <%= hoso.diung %></li>
+        <li>Tiêm chủng: <%= hoso.tiemchung %></li>
+        <li>Liên hệ khẩn cấp: <%= hoso.lienhekhancap %></li>
+      </ul>
+      <button onclick="anThongTin(event)">Xóa khỏi giao diện</button>      
+    </div>
+  <% } else if (timkiem) { %>
+    <p>Không tìm thấy hồ sơ với mã "<%= timkiem %>"</p>
+  <% } %>
+
+
+  <script>
+    function anThongTin() {
+      const x = document.getElementById('hoso-info');
+      if (x) x.remove();
+      event.target.style.display = 'none';
+    }
+  </script>
+
+  <h1>Danh sách hồ sơ sức khỏe</h1>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Mã hồ sơ</th>
+        <th>Mã bệnh nhân</th>
+        <th>Tiền sử bệnh</th>
+        <th>Thuốc đang dùng</th>
+        <th>Dị ứng</th>
+        <th>Tiêm chủng</th>
+        <th>Liên hệ khẩn cấp</th>
+        <th>Xoá</th>
+        <th>Sửa</th>
+        <th>Form sửa</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% danhSachHoso.forEach(hoso => { %>
+        <tr>
+          <td><%= hoso.mahoso %></td>
+          <td><%= hoso.mabenhnhan %></td>
+          <td><%= hoso.tiensubenh %></td>
+          <td><%= hoso.thuocdangsd %></td>
+          <td><%= hoso.diung %></td>
+          <td><%= hoso.tiemchung %></td>
+          <td><%= hoso.lienhekhancap %></td>
+          <td>
+            <form action="/xoahoso" method="POST" onsubmit="return confirm('Xoá hồ sơ này?');">
+              <input type="hidden" name="mahoso" value="<%= hoso.mahoso %>" />
+              <button type="submit">Xoá</button>
+            </form>
+          </td>
+          <td><button onclick="hienForm('<%= hoso.mahoso %>')">Sửa</button></td>
+          <td>
+            <form id="form-<%= hoso.mahoso %>" action="/suahoso/<%= hoso.mahoso %>" method="POST" style="display: none;">
+              <input type="text" name="mabenhnhan" value="<%= hoso.mabenhnhan %>" required />
+              <input type="text" name="tiensubenh" value="<%= hoso.tiensubenh %>" />
+              <input type="text" name="thuocdangsd" value="<%= hoso.thuocdangsd %>" />
+              <input type="text" name="diung" value="<%= hoso.diung %>" />
+              <input type="text" name="tiemchung" value="<%= hoso.tiemchung %>" />
+              <input type="text" name="lienhekhancap" value="<%= hoso.lienhekhancap %>" />
+              <button type="submit">Lưu</button>
+              <button type="button" onclick="anForm('<%= hoso.mahoso %>')">Hủy</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <%- include('partials/footer') %>
+</body>
+</html>

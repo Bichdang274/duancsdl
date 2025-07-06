@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Thuốc</title>
+  <link rel="stylesheet" href="/csdl2.css">
+</head>
+
+<script>
+  function hienForm(id) {
+    document.getElementById('form-' + id).style.display = 'block';
+  }
+  function anForm(id) {
+    document.getElementById('form-' + id).style.display = 'none';
+  }
+</script>
+
+<body>
+  <%- include('partials/header') %>
+
+  <h2 class="add">Thêm thuốc mới</h2>
+  <form method="POST" action="/themthuoc">
+    <input type="text" name="mathuoc" placeholder="Mã thuốc" required />
+    <input type="text" name="tenthuoc" placeholder="Tên thuốc" required />
+    <input type="date" name="hansudung" required />
+    <input type="text" name="huongdansudung" placeholder="Hướng dẫn sử dụng" required />
+    <button type="submit">Thêm</button>
+  </form>
+
+  <h2>Tìm thuốc</h2>
+  <form action="/timkiemthuoc" method="GET">
+    <input type="text" name="mathuoc" placeholder="Nhập mã thuốc" required />
+    <button type="submit">Tìm</button>
+  </form>
+
+  <% if (thuoc) { %>
+    <div id="thuoc-info">
+      <h3>Thông tin thuốc:</h3>
+      <ul>
+        <li>Mã thuốc: <%= thuoc.mathuoc %></li>
+        <li>Tên thuốc: <%= thuoc.tenthuoc %></li>
+        <li>Hạn sử dụng: <%= thuoc.hansudung.toISOString().split('T')[0] %></li>
+        <li>Hướng dẫn: <%= thuoc.huongdansudung %></li>
+      </ul>
+    <button onclick="anThongTin(event)">Xóa khỏi giao diện</button>      
+    </div>
+  <% } else if (timkiem) { %>
+    <p>Không tìm thấy thuốc với mã "<%= timkiem %>"</p>
+  <% } %>
+
+
+  <script>
+    function anThongTin() {
+      const x = document.getElementById('thuoc-info');
+      if (x) x.remove();
+      event.target.style.display = 'none';
+    }
+  </script>
+
+  <h1>Danh sách thuốc</h1>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Mã</th>
+        <th>Tên</th>
+        <th>HSD</th>
+        <th>Hướng dẫn</th>
+        <th>Xoá</th>
+        <th>Sửa</th>
+        <th>Form sửa</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% danhSachThuoc.forEach(t => { %>
+        <tr>
+          <td><%= t.mathuoc %></td>
+          <td><%= t.tenthuoc %></td>
+          <td><%= t.hansudung.toISOString().split('T')[0] %></td>
+          <td><%= t.huongdansudung %></td>
+          <td>
+            <form action="/xoathuoc" method="POST" onsubmit="return confirm('Xoá thuốc này?');">
+              <input type="hidden" name="mathuoc" value="<%= t.mathuoc %>" />
+              <button type="submit">Xoá</button>
+            </form>
+          </td>
+          <td><button onclick="hienForm('<%= t.mathuoc %>')">Sửa</button></td>
+          <td>
+            <form id="form-<%= t.mathuoc %>" action="/suathuoc/<%= t.mathuoc %>" method="POST" style="display:none;">
+              <input type="text" name="tenthuoc" value="<%= t.tenthuoc %>" required />
+              <input type="date" name="hansudung" value="<%= t.hansudung.toISOString().split('T')[0] %>" required />
+              <input type="text" name="huongdansudung" value="<%= t.huongdansudung %>" required />
+              <button type="submit">Lưu</button>
+              <button type="button" onclick="anForm('<%= t.mathuoc %>')">Huỷ</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <%- include('partials/footer') %>
+</body>
+</html>

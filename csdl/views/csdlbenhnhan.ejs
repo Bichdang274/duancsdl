@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Danh sách Bệnh nhân</title>
+  <link rel="stylesheet" href="/csdl2.css">
+</head>
+
+<script>
+  function hienForm(id) {
+    document.getElementById('form-' + id).style.display = 'block';
+  }
+  function anForm(id) {
+    document.getElementById('form-' + id).style.display = 'none';
+  }
+</script>
+
+<body>
+  <%- include('partials/header') %>
+
+  <h2 class="add">Thêm bệnh nhân mới</h2>
+  <form method="POST" action="/thembenhnhan">
+    <input type="text" name="mabenhnhan" placeholder="Nhập mã bệnh nhân" required />
+    <input type="text" name="tenbenhnhan" placeholder="Nhập tên bệnh nhân" required />
+    <input type="text" name="socccd" placeholder="Nhập số CCCD" required />
+    <input type="text" name="sothebaohiemyte" placeholder="Nhập số thẻ BHYT" required />
+    <input type="text" name="ngaysinh" placeholder="Nhập ngày sinh (YYYY-MM-DD)" required />
+    <input type="text" name="gioitinh" placeholder="Nhập giới tính" required />
+    <input type="text" name="diachi" placeholder="Nhập địa chỉ" required />
+    <input type="text" name="sdt" placeholder="Nhập số điện thoại" required />
+    <button type="submit">Thêm</button>
+  </form>
+
+  <h2>Tìm kiếm bệnh nhân</h2>
+  <form action="/timkiembenhnhan" method="GET">
+    <label for="mabenhnhan">Nhập mã bệnh nhân:</label>
+    <input type="text" name="mabenhnhan" required>
+    <button type="submit">Tìm</button>
+  </form>
+
+  <% if (benhnhan) { %>
+    <div id="benhnhan-info">
+      <h3>Thông tin bệnh nhân:</h3>
+      <ul>
+        <li>Mã bệnh nhân: <%= benhnhan.mabenhnhan %></li>
+        <li>Tên: <%= benhnhan.tenbenhnhan %></li>
+        <li>Số CCCD: <%= benhnhan.socccd %></li>
+        <li>Số BHYT: <%= benhnhan.sothebaohiemyte %></li>
+        <li>Ngày sinh: <%= benhnhan.ngaysinh %></li>
+        <li>Giới tính: <%= benhnhan.gioitinh %></li>
+        <li>Địa chỉ: <%= benhnhan.diachi %></li>
+        <li>Số điện thoại:
+          <% if (benhnhan.sdt) {
+               const sdtArr = benhnhan.sdt.split(','); %>
+            <% sdtArr.forEach(so => { %>
+              <li><%= so.trim() %></li>
+            <% }) %>
+          <% } else { %>
+            <li>Không có</li>
+          <% } %>
+        </li>
+      </ul>
+      <button onclick="anThongTin(event)">Xóa khỏi giao diện</button>
+    </div>
+  <% } else if (timkiem) { %>
+    <p>Không tìm thấy bệnh nhân với mã "<%= timkiem %>"</p>
+  <% } %>
+
+  <script>
+    function anThongTin() {
+      const thongTin = document.getElementById('benhnhan-info');
+      if (thongTin) {
+        thongTin.remove();
+      }
+      event.target.style.display = "none";
+    }
+  </script>
+
+  <h1>Danh sách bệnh nhân</h1>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Mã BN</th>
+        <th>Tên</th>
+        <th>CCCD</th>
+        <th>BHYT</th>
+        <th>Ngày sinh</th>
+        <th>Giới tính</th>
+        <th>Địa chỉ</th>
+        <th>SĐT</th>
+        <th>Xóa</th>
+        <th>Sửa</th>
+        <th>Form Sửa</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% danhSachBenhnhan.forEach(benhnhan => { %>
+        <tr>
+          <td><%= benhnhan.mabenhnhan %></td>
+          <td><%= benhnhan.tenbenhnhan %></td>
+          <td><%= benhnhan.socccd %></td>
+          <td><%= benhnhan.sothebaohiemyte %></td>
+          <td><%= benhnhan.ngaysinh %></td>
+          <td><%= benhnhan.gioitinh %></td>
+          <td><%= benhnhan.diachi %></td>
+          <td><%= benhnhan.sdt %></td>
+          <td>
+            <form action="/xoabenhnhan" method="POST" onsubmit="return confirm('Bạn có chắc muốn xoá bệnh nhân này?');">
+              <input type="hidden" name="mabenhnhan" value="<%= benhnhan.mabenhnhan %>" />
+              <button type="submit">Xoá</button>
+            </form>
+          </td>
+          <td>
+            <button type="button" onclick="hienForm('<%= benhnhan.mabenhnhan %>')">Sửa</button>
+          </td>
+          <td>
+            <form id="form-<%= benhnhan.mabenhnhan %>" action="/suabenhnhan/<%= benhnhan.mabenhnhan %>" method="POST" style="display: none;">
+              <input type="text" name="tenbenhnhan" value="<%= benhnhan.tenbenhnhan %>" required>
+              <input type="text" name="socccd" value="<%= benhnhan.socccd %>" required>
+              <input type="text" name="sothebaohiemyte" value="<%= benhnhan.sothebaohiemyte %>" required>
+              <input type="text" name="ngaysinh" value="<%= benhnhan.ngaysinh %>" required>
+              <input type="text" name="gioitinh" value="<%= benhnhan.gioitinh %>" required>
+              <input type="text" name="diachi" value="<%= benhnhan.diachi %>" required>
+              <input type="text" name="sdt" value="<%= benhnhan.sdt %>" required>
+              <button type="submit">Lưu</button>
+              <button type="button" onclick="anForm('<%= benhnhan.mabenhnhan %>')">Hủy</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <%- include('partials/footer') %>
+</body>
+</html>

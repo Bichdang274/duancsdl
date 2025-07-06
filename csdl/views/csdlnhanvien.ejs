@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Danh sách nhân viên</title>
+  <link rel="stylesheet" href="/csdl2.css">
+</head>
+
+<script>
+  function hienForm(id) {
+    document.getElementById('form-' + id).style.display = 'block';
+  }
+
+  function anForm(id) {
+    document.getElementById('form-' + id).style.display = 'none';
+  }
+</script>
+
+<body>
+  <%- include('partials/header') %>
+
+  <h2 class="add">Thêm nhân viên mới</h2>
+  <form method="POST" action="/themnhanvien">
+    <input type="text" name="maNV" placeholder="Nhập mã nhân viên" required />
+    <input type="text" name="hoten" placeholder="Nhập họ tên" required />
+    <input type="text" name="luong" placeholder="Nhập lương" required />
+    <input type="text" name="diachi" placeholder="Nhập địa chỉ" required />
+    <input type="text" name="gioitinh" placeholder="Nhập giới tính" required />
+    <input type="text" name="chucvu" placeholder="Nhập chức vụ" required />
+    <button type="submit">Thêm</button>
+  </form>
+
+  <h2>Tìm kiếm nhân viên</h2>
+  <form action="/timkiemnhanvien" method="GET">
+    <label for="maNV">Nhập mã nhân viên:</label>
+    <input type="text" name="maNV" required>
+    <button type="submit">Tìm</button>
+  </form>
+
+  <% if (nhanvien) { %>
+    <div id="nhanvien-info">
+      <h3>Thông tin nhân viên:</h3>
+      <ul>
+        <li>Mã nhân viên: <%= nhanvien.maNV %></li>
+        <li>Họ tên: <%= nhanvien.hoten %></li>
+        <li>Lương: <%= nhanvien.luong %></li>
+        <li>Địa chỉ: <%= nhanvien.diachi %></li>
+        <li>Giới tính: <%= nhanvien.gioitinh %></li>
+        <li>Chức vụ: <%= nhanvien.chucvu %></li>
+      </ul>
+    <button onclick="anThongTin(event)">Xóa khỏi giao diện</button>      
+    </div>
+  <% } else if (timkiem) { %>
+    <p>Không tìm thấy nhân viên với mã "<%= timkiem %>"</p>
+  <% } %>
+
+
+  <script>
+    function anThongTin() {
+      const thongTin = document.getElementById('nhanvien-info');
+      if (thongTin) {
+        thongTin.remove();
+      }
+      event.target.style.display = "none";
+    }
+  </script>
+
+  <h1>Danh sách nhân viên</h1>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Mã NV</th>
+        <th>Họ tên</th>
+        <th>Lương</th>
+        <th>Địa chỉ</th>
+        <th>Giới tính</th>
+        <th>Chức vụ</th>
+        <th>Xóa</th>
+        <th>Sửa</th>
+        <th>Form Sửa</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% danhSachNhanvien.forEach(nhanvien => { %>
+        <tr>
+          <td><%= nhanvien.maNV %></td>
+          <td><%= nhanvien.hoten %></td>
+          <td><%= nhanvien.luong %></td>
+          <td><%= nhanvien.diachi %></td>
+          <td><%= nhanvien.gioitinh %></td>
+          <td><%= nhanvien.chucvu %></td>
+          <td>
+            <form action="/xoanhanvien" method="POST" onsubmit="return confirm('Bạn có chắc muốn xoá nhân viên này?');">
+              <input type="hidden" name="maNV" value="<%= nhanvien.maNV %>" />
+              <button type="submit">Xoá</button>
+            </form>
+          </td>
+          <td>
+            <button type="button" onclick="hienForm('<%= nhanvien.maNV %>')">Sửa</button>
+          </td>
+          <td>
+            <form id="form-<%= nhanvien.maNV %>" action="/suanhanvien/<%= nhanvien.maNV %>" method="POST" style="display: none;">
+              <input type="text" name="hoten" value="<%= nhanvien.hoten %>" required>
+              <input type="text" name="luong" value="<%= nhanvien.luong %>" required>
+              <input type="text" name="diachi" value="<%= nhanvien.diachi %>" required>
+              <input type="text" name="gioitinh" value="<%= nhanvien.gioitinh %>" required>
+              <input type="text" name="chucvu" value="<%= nhanvien.chucvu %>" required>
+              <button type="submit">Lưu</button>
+              <button type="button" onclick="anForm('<%= nhanvien.maNV %>')">Hủy</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <%- include('partials/footer') %>
+</body>
+</html>

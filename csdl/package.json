@@ -1,0 +1,30 @@
+{
+  "name": "csdl",
+  "version": "1.0.0",
+  "main": "csdl.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "csdl": "file:",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "mysql2": "^3.14.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bichdang274/duancsdl.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Bichdang274/duancsdl/issues"
+  },
+  "homepage": "https://github.com/Bichdang274/duancsdl#readme",
+  "description": ""
+}

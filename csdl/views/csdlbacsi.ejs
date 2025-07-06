@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quản lý Bác sĩ</title>
+  <link rel="stylesheet" href="/csdl2.css">
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <h2 class="add">Thêm bác sĩ mới</h2>
+  <form method="POST" action="/thembacsi">
+    <input type="text" name="mabacsi" placeholder="Mã bác sĩ" required />
+    <input type="text" name="tenbacsi" placeholder="Tên bác sĩ" required />
+    <input type="text" name="chuyenkhoa" placeholder="Chuyên khoa" required />
+    <input type="text" name="luong" placeholder="Lương" required />
+    <input type="text" name="diachi" placeholder="Địa chỉ" required />
+    <input type="text" name="gioitinh" placeholder="Giới tính" required />
+    <input type="text" name="sdt" placeholder="Số điện thoại (cách nhau bằng dấu , nếu nhiều)" required />
+    <button type="submit">Thêm</button>
+  </form>
+
+  <h2>Tìm kiếm bác sĩ</h2>
+  <form action="/timkiembacsi" method="GET">
+    <label>Nhập mã bác sĩ:</label>
+    <input type="text" name="mabacsi" required />
+    <button type="submit">Tìm</button>
+  </form>
+
+  <% if (bacsi) { %>
+    <div id="bacsi-info">
+      <h3>Thông tin bác sĩ:</h3>
+      <ul>
+        <li>Mã bác sĩ: <%= bacsi.mabacsi %></li>
+        <li>Tên: <%= bacsi.tenbacsi %></li>
+        <li>Chuyên khoa: <%= bacsi.chuyenkhoa %></li>
+        <li>Lương: <%= bacsi.luong %></li>
+        <li>Địa chỉ: <%= bacsi.diachi %></li>
+        <li>Giới tính: <%= bacsi.gioitinh %></li>
+        <li>Số điện thoại:
+          <% if (bacsi.sdt && bacsi.sdt.includes(',')) { 
+              const sdtArr = bacsi.sdt.split(','); %>
+              <ul>
+              <% sdtArr.forEach(so => { %>
+                <li><%= so.trim() %></li>
+              <% }) %>
+              </ul>
+          <% } else if (bacsi.sdt) { %>
+            <%= bacsi.sdt %>
+          <% } else { %>
+            Không có
+          <% } %>
+        </li>
+      </ul>
+      <button onclick="anThongTin(event)">Xóa khỏi giao diện</button>
+    </div>
+  <% } else if (timkiem) { %>
+    <p>Không tìm thấy bác sĩ với mã "<%= timkiem %>"</p>
+  <% } %>
+
+  <script>
+    function anThongTin() {
+      const thongTin = document.getElementById('bacsi-info');
+      if (thongTin) thongTin.remove();
+      event.target.style.display = "none";
+    }
+    function hienForm(id) {
+      document.getElementById('form-' + id).style.display = 'block';
+    }
+    function anForm(id) {
+      document.getElementById('form-' + id).style.display = 'none';
+    }
+  </script>
+
+  <h1>Danh sách bác sĩ</h1>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Mã bác sĩ</th>
+        <th>Tên bác sĩ</th>
+        <th>Chuyên khoa</th>
+        <th>Lương</th>
+        <th>Địa chỉ</th>
+        <th>Giới tính</th>
+        <th>SĐT</th>
+        <th>Xoá</th>
+        <th>Sửa</th>
+        <th>Form sửa</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% danhSachBacSi.forEach(bacsi => { %>
+        <tr>
+          <td><%= bacsi.mabacsi %></td>
+          <td><%= bacsi.tenbacsi %></td>
+          <td><%= bacsi.chuyenkhoa %></td>
+          <td><%= bacsi.luong %></td>
+          <td><%= bacsi.diachi %></td>
+          <td><%= bacsi.gioitinh %></td>
+          <td><%= bacsi.sdt %></td>
+          <td>
+            <form action="/xoabacsi" method="POST" onsubmit="return confirm('Bạn có chắc muốn xoá?');">
+              <input type="hidden" name="mabacsi" value="<%= bacsi.mabacsi %>">
+              <button type="submit">Xoá</button>
+            </form>
+          </td>
+          <td>
+            <button onclick="hienForm('<%= bacsi.mabacsi %>')">Sửa</button>
+          </td>
+          <td>
+            <form id="form-<%= bacsi.mabacsi %>" action="/suabacsi/<%= bacsi.mabacsi %>" method="POST" style="display: none;">
+              <input type="text" name="tenbacsi" value="<%= bacsi.tenbacsi %>" required>
+              <input type="text" name="chuyenkhoa" value="<%= bacsi.chuyenkhoa %>" required>
+              <input type="text" name="luong" value="<%= bacsi.luong %>" required>
+              <input type="text" name="diachi" value="<%= bacsi.diachi %>" required>
+              <input type="text" name="gioitinh" value="<%= bacsi.gioitinh %>" required>
+              <input type="text" name="sdt" value="<%= bacsi.sdt %>" required>
+              <button type="submit">Lưu</button>
+              <button type="button" onclick="anForm('<%= bacsi.mabacsi %>')">Hủy</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <%- include('partials/footer') %>
+</body>
+</html>

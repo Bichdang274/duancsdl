@@ -1,0 +1,167 @@
+
+
+/* ===== Color Variables ===== */
+:root {
+  --bg: #E3F2FD;            
+  --surface: #FFFFFF;     
+  --primary: rgb(52,99,115);       
+  --secondary: #81D4FA;     
+  --accent: #64B5F6;       
+  --highlight: #BBDEFB;     
+  --text: #1E1E1E;        
+  --border: #CFD8DC;      
+  --hover: #E1F5FE;         
+  --radius: 8px;           
+  --spacing: 12px;         
+  --font: 'Segoe UI', Tahoma, Arial, sans-serif;
+}
+
+
+
+/* ===== Global ===== */
+body :not(header) form,
+body :not(footer) form {
+  padding: var(--spacing);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+}
+
+a { color: var(--accent); text-decoration: none; }
+h1, h2 { color: var(--primary); margin-bottom: var(--spacing); }
+
+/* ===== Forms ===== */
+form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+  gap: var(--spacing);
+  background: var(--surface);
+  padding: var(--spacing);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-bottom: var(--spacing);
+}
+form input, form button {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px 8px;
+  font-size: 0.9em;
+}
+form input:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+form button {
+  background: var(--primary);
+  grid-column: span 2;
+  cursor: pointer;
+  transition: background .2s;
+}
+form button:hover {
+  background: var(--primary-dark);
+}
+
+/* ===== Info Box ===== */
+#bacsi-info {
+  background: var(--surface);
+  border-left: 4px solid var(--accent);
+  padding: var(--spacing);
+  border-radius: var(--radius);
+  margin-bottom: var(--spacing);
+  position: relative;
+}
+#bacsi-info h3 { margin-top: 0; color: var(--accent); }
+#bacsi-info button {
+  position: absolute;
+  top: var(--spacing);
+  right: var(--spacing);
+  background: transparent;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+}
+#bacsi-info button:hover { color: var(--primary); }
+
+/* ===== Table ===== */
+.table-container {
+  overflow-x: auto;
+  margin-bottom: var(--spacing);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+th, td {
+  padding: var(--spacing);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9em;
+}
+th {
+  background: var(--primary);
+  color: #fff;
+  text-align: left;
+}
+tbody tr:nth-child(even) {
+  background: var(--hover);
+}
+tbody tr:hover {
+  background: var(--border);
+}
+
+/* ===== Buttons ===== */
+button {
+  margin: 2px;
+  padding: 4px 8px;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background .2s;
+  width:50px;
+}
+button[type="submit"] {
+  background: rgb(148,195,196);
+  color: #fff;
+}
+button[type="submit"]:hover {
+  background: rgb(148,195,196);
+}
+button[type="button"] {
+  background: var(--accent);
+  color: var(--bg);
+}
+button[type="button"]:hover {
+  background: var(--primary);
+}
+
+/* ===== Inline Edit Form ===== */
+form[id^="form-"] {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px,1fr));
+  gap: var(--spacing);
+  background: var(--surface);
+  padding: var(--spacing);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-top: var(--spacing);
+}
+form[id^="form-"] input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 600px) {
+  form { grid-template-columns: 1fr; }
+  table, th, td { font-size: 0.85em; }
+}
+
+form label{
+    color: rgb(52,99,115);
+}

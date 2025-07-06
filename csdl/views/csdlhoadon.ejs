@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hóa đơn</title>
+  <link rel="stylesheet" href="/csdl2.css">
+</head>
+
+<script>
+  function hienForm(mahoadon) {
+    document.getElementById('form-' + mahoadon).style.display = 'block';
+  }
+  function anForm(mahoadon) {
+    document.getElementById('form-' + mahoadon).style.display = 'none';
+  }
+</script>
+
+<body>
+  <%- include('partials/header') %>
+
+  <h2 class="add">Thêm hóa đơn</h2>
+  <form method="POST" action="/themhoadon">
+    <input type="text" name="mahoadon" placeholder="Mã hóa đơn" required />
+    <input type="text" name="maphieukham" placeholder="Mã phiếu khám" required />
+    <input type="text" name="mabenhnhan" placeholder="Mã bệnh nhân" required />
+    <input type="date" name="ngaylap" required />
+    <input type="text" name="trangthai" placeholder="Trạng thái" required />
+    <button type="submit">Thêm</button>
+  </form>
+
+  <h2>Tìm kiếm hóa đơn</h2>
+  <form action="/timkiemhoadon" method="GET">
+    <input type="text" name="mahoadon" placeholder="Nhập mã hóa đơn" required />
+    <button type="submit">Tìm</button>
+  </form>
+
+  <% if (hoadon) { %>
+    <div id="hoadon-info">
+      <h3>Thông tin hóa đơn:</h3>
+      <ul>
+        <li>Mã hóa đơn: <%= hoadon.mahoadon %></li>
+        <li>Mã phiếu khám: <%= hoadon.maphieukham %></li>
+        <li>Mã bệnh nhân: <%= hoadon.mabenhnhan %></li>
+        <li>Ngày lập: <%= hoadon.ngaylap %></li>
+        <li>Trạng thái: <%= hoadon.trangthai %></li>
+      </ul>
+      <button onclick="anThongTin(event)">Xóa khỏi giao diện</button>      
+    </div>
+  <% } else if (timkiem) { %>
+    <p>Không tìm thấy hóa đơn với mã "<%= timkiem %>"</p>
+  <% } %>
+
+  <script>
+    function anThongTin() {
+      const x = document.getElementById('hoadon-info');
+      if (x) x.remove();
+      event.target.style.display = 'none';
+    }
+  </script>
+
+  <h1>Danh sách hóa đơn</h1>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Mã hóa đơn</th>
+        <th>Mã phiếu khám</th>
+        <th>Mã bệnh nhân</th>
+        <th>Ngày lập</th>
+        <th>Trạng thái</th>
+        <th>Xoá</th>
+        <th>Sửa</th>
+        <th>Form sửa</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% danhSachHoadon.forEach(h => { %>
+        <tr>
+          <td><%= h.mahoadon %></td>
+          <td><%= h.maphieukham %></td>
+          <td><%= h.mabenhnhan %></td>
+          <td><%= h.ngaylap %></td>
+          <td><%= h.trangthai %></td>
+          <td>
+            <form action="/xoahoadon" method="POST" onsubmit="return confirm('Xoá hóa đơn này?');">
+              <input type="hidden" name="mahoadon" value="<%= h.mahoadon %>" />
+              <button type="submit">Xoá</button>
+            </form>
+          </td>
+          <td><button onclick="hienForm('<%= h.mahoadon %>')">Sửa</button></td>
+          <td>
+            <form id="form-<%= h.mahoadon %>" action="/suahoadon/<%= h.mahoadon %>" method="POST" style="display: none;">
+              <input type="text" name="maphieukham" value="<%= h.maphieukham %>" required />
+              <input type="text" name="mabenhnhan" value="<%= h.mabenhnhan %>" required />
+              <input type="date" name="ngaylap" value="<%= h.ngaylap %>" required />
+              <input type="text" name="trangthai" value="<%= h.trangthai %>" required />
+              <button type="submit">Lưu</button>
+              <button type="button" onclick="anForm('<%= h.mahoadon %>')">Hủy</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <%- include('partials/footer') %>
+</body>
+</html>

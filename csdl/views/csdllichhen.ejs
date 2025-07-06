@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quản lý Lịch hẹn</title>
+  <link rel="stylesheet" href="/csdl2.css">
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <h2 class="add">Thêm lịch hẹn</h2>
+  <form method="POST" action="/themlichhen">
+    <input type="text"   name="malichhen"   placeholder="Mã lịch hẹn" required />
+    <input type="text"   name="mabacsi"      placeholder="Mã bác sĩ" required />
+    <input type="text"   name="mabenhnhan"   placeholder="Mã bệnh nhân" required />
+    <input type="date"   name="thoigianhen"  placeholder="Ngày giờ hẹn" required />
+    <input type="text"   name="tinhtrang"    placeholder="Tình trạng" required />
+    <input type="text"   name="ghichu"       placeholder="Ghi chú" />
+    <input type="text"   name="maNV"         placeholder="Mã nhân viên" required />
+    <button type="submit">Thêm</button>
+  </form>
+
+  <h2>Tìm kiếm lịch hẹn</h2>
+  <form action="/timkiemlichhen" method="GET">
+    <label for="malichhen">Nhập mã lịch hẹn:</label>
+    <input type="text" name="malichhen" required placeholder="Mã lịch hẹn">
+    <button type="submit">Tìm</button>
+  </form>
+
+  <% if (lichhen) { %>
+  <div id="lh-info">
+    <h3>Thông tin lịch hẹn:</h3>
+    <ul>
+      <li><strong>Mã LH:</strong> <%= lichhen.malichhen %></li>
+      <li><strong>Bác sĩ:</strong>   <%= lichhen.mabacsi %></li>
+      <li><strong>Bệnh nhân:</strong> <%= lichhen.mabenhnhan %></li>
+      <li><strong>Ngày hẹn:</strong>  <%= lichhen.thoigianhen.toISOString().slice(0,10) %></li>
+      <li><strong>Tình trạng:</strong> <%= lichhen.tinhtrang %></li>
+      <li><strong>Ghi chú:</strong>    <%= lichhen.ghichu %></li>
+      <li><strong>Nhân viên:</strong>  <%= lichhen.maNV %></li>
+    </ul>
+    <button onclick="anThongTin(event)">Xóa khỏi giao diện</button>
+  </div>
+  <% } else if (timkiem) { %>
+  <p>Không tìm thấy lịch hẹn với mã "<%= timkiem %>"</p>
+  <% } %>
+
+  <h1>Danh sách Lịch hẹn</h1>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Mã LH</th><th>BS</th><th>BN</th><th>Ngày hẹn</th>
+        <th>Tình trạng</th><th>Ghi chú</th><th>NV</th>
+        <th>Xóa</th><th>Sửa</th><th>Form sửa</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% danhSachLichHen.forEach(lh => { %>
+      <tr>
+        <td><%= lh.malichhen %></td>
+        <td><%= lh.mabacsi %></td>
+        <td><%= lh.mabenhnhan %></td>
+        <td><%= lh.thoigianhen.toISOString().slice(0,10) %></td>
+        <td><%= lh.tinhtrang %></td>
+        <td><%= lh.ghichu %></td>
+        <td><%= lh.maNV %></td>
+        <td>
+          <form action="/xoalichhen" method="POST" onsubmit="return confirm('Bạn có chắc muốn xoá lịch hẹn này?')">
+            <input type="hidden" name="malichhen" value="<%= lh.malichhen %>">
+            <button type="submit">Xóa</button>
+          </form>
+        </td>
+        <td>
+          <button onclick="hienForm('<%= lh.malichhen %>')">Sửa</button>
+        </td>
+        <td>
+          <form
+            id="form-<%= lh.malichhen %>"
+            action="/sualichhen/<%= lh.malichhen %>"
+            method="POST"
+            style="display:none"
+          >
+            <input type="text"   name="mabacsi"      value="<%= lh.mabacsi %>" required>
+            <input type="text"   name="mabenhnhan"   value="<%= lh.mabenhnhan %>" required>
+            <input type="date"   name="thoigianhen"  value="<%= lh.thoigianhen.toISOString().slice(0,10) %>" required>
+            <input type="text"   name="tinhtrang"    value="<%= lh.tinhtrang %>" required>
+            <input type="text"   name="ghichu"       value="<%= lh.ghichu %>">
+            <input type="text"   name="maNV"         value="<%= lh.maNV %>" required>
+            <button type="submit">Lưu</button>
+            <button type="button" onclick="anForm('<%= lh.malichhen %>')">Hủy</button>
+          </form>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <%- include('partials/footer') %>
+
+  <script>
+    function hienForm(id) { document.getElementById('form-' + id).style.display = 'block'; }
+    function anForm(id)   { document.getElementById('form-' + id).style.display = 'none'; }
+    function anThongTin(evt) {
+      const info = document.getElementById('lh-info'); if (info) info.remove();
+      evt.target.style.display = 'none';
+    }
+  </script>
+</body>
+</html>

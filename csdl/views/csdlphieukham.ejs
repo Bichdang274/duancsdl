@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quản lý Phiếu khám</title>
+  <link rel="stylesheet" href="/csdl2.css">
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <h2 class="add">Thêm Phiếu khám</h2>
+  <form method="POST" action="/themphieukham">
+    <input type="text" name="maphieukham"   placeholder="Mã phiếu khám" required />
+    <input type="text" name="trieuchung"    placeholder="Triệu chứng"    required />
+    <input type="text" name="chuandoan"     placeholder="Chẩn đoán"     required />
+    <input type="text" name="ghichu"        placeholder="Ghi chú" />
+    <input type="text" name="malichhen"     placeholder="Mã lịch hẹn"    required />
+    <input type="text" name="mabacsi"       placeholder="Mã bác sĩ"      required />
+    <input type="text" name="mahoso"        placeholder="Mã hồ sơ"       required />
+    <button type="submit">Thêm</button>
+  </form>
+
+  <h2>Tìm kiếm Phiếu khám</h2>
+  <form action="/timkiemphieukham" method="GET">
+    <label for="maphieukham">Nhập mã phiếu khám:</label>
+    <input type="text" id="maphieukham" name="maphieukham" required />
+    <button type="submit">Tìm</button>
+  </form>
+
+  <% if (phieukham) { %>
+    <div id="pk-info">
+      <h3>Thông tin phiếu khám:</h3>
+      <ul>
+        <li><strong>Mã PK:</strong>        <%= phieukham.maphieukham %></li>
+        <li><strong>Triệu chứng:</strong>   <%= phieukham.trieuchung %></li>
+        <li><strong>Chẩn đoán:</strong>    <%= phieukham.chuandoan %></li>
+        <li><strong>Ghi chú:</strong>       <%= phieukham.ghichu %></li>
+        <li><strong>Mã lịch hẹn:</strong>   <%= phieukham.malichhen %></li>
+        <li><strong>Mã bác sĩ:</strong>     <%= phieukham.mabacsi %></li>
+        <li><strong>Mã hồ sơ:</strong>      <%= phieukham.mahoso %></li>
+      </ul>
+      <button onclick="anThongTin(event)">Xóa khỏi giao diện</button>
+    </div>
+  <% } else if (timkiem) { %>
+    <p>Không tìm thấy phiếu khám với mã "<%= timkiem %>"</p>
+  <% } %>
+
+  <h1>Danh sách Phiếu khám</h1>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Mã PK</th>
+        <th>Triệu chứng</th>
+        <th>Chẩn đoán</th>
+        <th>Ghi chú</th>
+        <th>Lịch hẹn</th>
+        <th>Bác sĩ</th>
+        <th>Hồ sơ</th>
+        <th>Xóa</th>
+        <th>Sửa</th>
+        <th>Form sửa</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% danhSachPhieuKham.forEach(pk => { %>
+        <tr>
+          <td><%= pk.maphieukham %></td>
+          <td><%= pk.trieuchung %></td>
+          <td><%= pk.chuandoan %></td>
+          <td><%= pk.ghichu %></td>
+          <td><%= pk.malichhen %></td>
+          <td><%= pk.mabacsi %></td>
+          <td><%= pk.mahoso %></td>
+          <td>
+            <form action="/xoaphieukham" method="POST" onsubmit="return confirm('Bạn có chắc muốn xoá?')">
+              <input type="hidden" name="maphieukham" value="<%= pk.maphieukham %>">
+              <button type="submit">Xóa</button>
+            </form>
+          </td>
+          <td>
+            <button type="button" onclick="hienForm('<%= pk.maphieukham %>')">Sửa</button>
+          </td>
+          <td>
+            <form id="form-<%= pk.maphieukham %>" action="/suaphieukham/<%= pk.maphieukham %>" method="POST" style="display:none">
+              <input type="text" name="trieuchung"  value="<%= pk.trieuchung %>" required>
+              <input type="text" name="chuandoan"   value="<%= pk.chuandoan %>" required>
+              <input type="text" name="ghichu"      value="<%= pk.ghichu %>">
+              <input type="text" name="malichhen"   value="<%= pk.malichhen %>" required>
+              <input type="text" name="mabacsi"     value="<%= pk.mabacsi %>" required>
+              <input type="text" name="mahoso"      value="<%= pk.mahoso %>" required>
+              <button type="submit">Lưu</button>
+              <button type="button" onclick="anForm('<%= pk.maphieukham %>')">Hủy</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <%- include('partials/footer') %>
+
+  <script>
+    function hienForm(id) { document.getElementById('form-' + id).style.display = 'block'; }
+    function anForm(id)   { document.getElementById('form-' + id).style.display = 'none'; }
+    function anThongTin(evt) {
+      const info = document.getElementById('pk-info');
+      if (info) info.remove();
+      evt.target.style.display = 'none';
+    }
+  </script>
+</body>
+</html>

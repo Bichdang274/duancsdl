@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Người thân</title>
+  <link rel="stylesheet" href="/csdl2.css">
+</head>
+
+<script>
+  function hienForm(id) {
+    document.getElementById('form-' + id).style.display = 'block';
+  }
+  function anForm(id) {
+    document.getElementById('form-' + id).style.display = 'none';
+  }
+</script>
+
+<body>
+  <%- include('partials/header') %>
+
+  <h2 class="add">Thêm người thân</h2>
+  <form method="POST" action="/themnguoithan">
+    <input type="text" name="mabenhnhan" placeholder="Mã bệnh nhân" required />
+    <input type="text" name="hoten" placeholder="Họ tên" required />
+    <input type="text" name="moiquanhe" placeholder="Mối quan hệ" required />
+    <input type="text" name="sdt" placeholder="SĐT" required />
+    <button type="submit">Thêm</button>
+  </form>
+
+  <h2>Tìm kiếm người thân</h2>
+  <form action="/timkiemnguoithan" method="GET">
+    <input type="text" name="mabenhnhan" placeholder="Nhập mã bệnh nhân" required />
+    <button type="submit">Tìm</button>
+  </form>
+
+  <% if (nguoithan) { %>
+    <div id="nguoithan-info">
+      <h3>Thông tin người thân:</h3>
+      <ul>
+        <li>Mã bệnh nhân: <%= nguoithan.mabenhnhan %></li>
+        <li>Họ tên: <%= nguoithan.hoten %></li>
+        <li>Mối quan hệ: <%= nguoithan.moiquanhe %></li>
+        <li>SĐT: <%= nguoithan.sdt %></li>
+      </ul>
+    <button onclick="anThongTin(event)">Xóa khỏi giao diện</button>   
+    </div>
+  <% } else if (timkiem) { %>
+    <p>Không tìm thấy người thân với mã "<%= timkiem %>"</p>
+  <% } %>
+
+
+  <script>
+    function anThongTin() {
+      const x = document.getElementById('nguoithan-info');
+      if (x) x.remove();
+      event.target.style.display = 'none';
+    }
+  </script>
+
+  <h1>Danh sách người thân</h1>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Mã bệnh nhân</th>
+        <th>Họ tên</th>
+        <th>Mối quan hệ</th>
+        <th>SĐT</th>
+        <th>Xoá</th>
+        <th>Sửa</th>
+        <th>Form sửa</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% danhSachNguoithan.forEach(nt => { %>
+        <tr>
+          <td><%= nt.mabenhnhan %></td>
+          <td><%= nt.hoten %></td>
+          <td><%= nt.moiquanhe %></td>
+          <td><%= nt.sdt %></td>
+          <td>
+            <form action="/xoanguoithan" method="POST" onsubmit="return confirm('Xoá người thân này?');">
+              <input type="hidden" name="mabenhnhan" value="<%= nt.mabenhnhan %>" />
+              <button type="submit">Xoá</button>
+            </form>
+          </td>
+          <td><button onclick="hienForm('<%= nt.mabenhnhan %>')">Sửa</button></td>
+          <td>
+            <form id="form-<%= nt.mabenhnhan %>" action="/suanguoithan/<%= nt.mabenhnhan %>" method="POST" style="display:none;">
+              <input type="text" name="hoten" value="<%= nt.hoten %>" required />
+              <input type="text" name="moiquanhe" value="<%= nt.moiquanhe %>" required />
+              <input type="text" name="sdt" value="<%= nt.sdt %>" required />
+              <button type="submit">Lưu</button>
+              <button type="button" onclick="anForm('<%= nt.mabenhnhan %>')">Huỷ</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <%- include('partials/footer') %>
+</body>
+</html>
