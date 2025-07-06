@@ -321,7 +321,7 @@ app.get('/csdlbenhnhan', (req, res) => {
 
 app.post('/thembenhnhan', (req, res) => { 
   const { mabenhnhan, tenbenhnhan, luong, diachi, gioitinh, sdt } = req.body; 
-  const sql1 = 'INSERT INTO benhnhan (mabenhnhan, tenbenhnhan, chuyenkhoa, luong, diachi, gioitinh) VALUES (?, ?, ?, ?, ?, ?)'; 
+  const sql1 = 'INSERT INTO benhnhan (mabenhnhan, tenbenhnhan, luong, diachi, gioitinh) VALUES (?, ?, ?, ?, ?, ?)'; 
   const values1 = [mabenhnhan, tenbenhnhan, luong, diachi, gioitinh]; 
   const sql2 = 'INSERT INTO benhnhan_sdt (mabenhnhan, sdt) VALUES (?, ?)'; 
   const values2 = [mabenhnhan, sdt]; 
@@ -377,7 +377,7 @@ app.get('/timkiembenhnhan', (req, res) => {
 
 app.get('/benhnhan', (req, res) => { 
   const query = ` 
-    SELECT benhnhan.mabenhnhan, benhnhan.tenbenhnhan, benhnhan.chuyenkhoa, GROUP_CONCAT(benhnhan_sdt.sdt) AS sdt 
+    SELECT benhnhan.mabenhnhan, benhnhan.tenbenhnhan, GROUP_CONCAT(benhnhan_sdt.sdt) AS sdt 
     FROM benhnhan  
     LEFT JOIN benhnhan_sdt ON benhnhan.mabenhnhan = benhnhan_sdt.mabenhnhan 
     GROUP BY benhnhan.mabenhnhan 
@@ -411,10 +411,10 @@ app.post('/xoabenhnhan', (req, res) => {
 
 app.post('/suabenhnhan/:mabenhnhan', (req, res) => { 
   const mabenhnhan = req.params.mabenhnhan; 
-  const { tenbenhnhan, chuyenkhoa, luong, diachi, gioitinh, sdt } = req.body; 
+  const { tenbenhnhan, luong, diachi, gioitinh, sdt } = req.body; 
   const sqlUpdate = ` 
     UPDATE benhnhan  
-    SET tenbenhnhan = ?, chuyenkhoa = ?, luong = ?, diachi = ?, gioitinh = ? 
+    SET tenbenhnhan = ?, luong = ?, diachi = ?, gioitinh = ? 
     WHERE mabenhnhan = ? 
   `; 
   const sqlDeleteSDT = `DELETE FROM benhnhan_sdt WHERE mabenhnhan = ?`; 
